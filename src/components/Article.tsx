@@ -55,6 +55,7 @@ const ClapNotice = styled.div`
 const ContentRow = styled.div`
   display: flex;
   gap: 1rem;
+  margin-top: 1rem;
 `;
 
 const TextContent = styled.div`
@@ -64,7 +65,7 @@ const TextContent = styled.div`
 const Title = styled.h2`
   font-size: 1rem;
   font-weight: 600;
-  margin: 1rem 0 0 0;
+  margin: 0;
 
   @media (min-width: 500px) {
     font-size: 1.25rem;
