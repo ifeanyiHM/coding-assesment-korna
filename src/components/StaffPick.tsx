@@ -1,4 +1,8 @@
 import styled from "styled-components";
+
+import Author from "./Author";
+import GlobalStyles from "../styles/GlobalStyles";
+
 import { PiStarFourFill } from "react-icons/pi";
 import type { MediumFeedItem } from "../data/data";
 
@@ -7,40 +11,9 @@ const AsideArticle = styled.article`
   cursor: pointer;
 `;
 
-const InfoRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin-bottom: 0.25rem;
-
-  @media (min-width: 1280px) {
-    font-size: 0.813rem;
-  }
-`;
-
-const InfoRowImage = styled.div`
-  flex-shrink: 0;
-`;
-
-const InfoRowChild = styled.span`
-  a {
-    flex-shrink: 0;
-    color: #000;
-    text-decoration: none;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-`;
-
 const Title = styled.h3`
   font-size: 1rem;
-  font-weight: 500;
-  color: #242424;
-  margin: 0;
+  margin: 0.25rem 0 0 0;
 `;
 
 const Stats = styled.div`
@@ -48,7 +21,7 @@ const Stats = styled.div`
   display: flex;
   align-items: center;
   gap: 1.25rem;
-  font-size: 0.875rem;
+  font-size: 0.813rem;
   color: #6b7280;
 `;
 
@@ -59,40 +32,29 @@ interface StaffPickProps {
 
 function StaffPick({ item, index }: StaffPickProps) {
   return (
-    <AsideArticle>
-      <div style={{ flex: "1 1 0%" }}>
-        <InfoRow>
-          <InfoRowImage>
-            <img
-              src={`/staff${index + 1}.PNG`}
-              alt="profile"
-              width={22}
-              height={25}
-              style={{ objectFit: "cover" }}
-            />
-          </InfoRowImage>
-          {item.category && "In "}
-          <InfoRowChild>
-            <a href="#">{item.category}</a>
-          </InfoRowChild>
+    <>
+      <GlobalStyles />
+      <AsideArticle>
+        <div style={{ flex: "1 1 0%" }}>
+          <Author
+            index={index}
+            item={item}
+            width={22}
+            height={25}
+            src="staff"
+          />
 
-          {item.category && " by "}
+          <>
+            <Title>{item.title}</Title>
+          </>
 
-          <InfoRowChild>
-            <a href="#">{item.author}</a>
-          </InfoRowChild>
-        </InfoRow>
-
-        <div>
-          <Title>{item.title}</Title>
+          <Stats>
+            {index === 1 && <PiStarFourFill color="#ffc017" />}
+            <span>{item.stats.date}</span>
+          </Stats>
         </div>
-
-        <Stats>
-          {index === 1 && <PiStarFourFill color="#ffc017" />}
-          <span>{item.stats.date}</span>
-        </Stats>
-      </div>
-    </AsideArticle>
+      </AsideArticle>
+    </>
   );
 }
 export default StaffPick;

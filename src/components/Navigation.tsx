@@ -1,4 +1,6 @@
 import styled from "styled-components";
+import GlobalStyles from "../styles/GlobalStyles";
+
 import { CiSearch } from "react-icons/ci";
 import { PiNotePencilThin } from "react-icons/pi";
 import { VscBell } from "react-icons/vsc";
@@ -173,41 +175,44 @@ const Avatar = styled.span`
 
 function Navigation() {
   return (
-    <Nav>
-      <NavContainer>
-        <Left>
-          <Hamburger>
-            <span />
-            <span />
-            <span />
-          </Hamburger>
+    <>
+      <GlobalStyles />
+      <Nav>
+        <NavContainer>
+          <Left>
+            <Hamburger>
+              <span />
+              <span />
+              <span />
+            </Hamburger>
 
-          <LogoHeading>
-            <a href="#">
-              <img src="/mediumLogo.PNG" alt="medium logo" />
-            </a>
-          </LogoHeading>
+            <LogoHeading>
+              <a href="#">
+                <img src="/mediumLogo.PNG" alt="medium logo" />
+              </a>
+            </LogoHeading>
 
-          <SearchWrapper>
-            <CiSearch size={24} className="icon" />
-            <SearchInput placeholder="Search" />
-          </SearchWrapper>
-        </Left>
+            <SearchWrapper>
+              <CiSearch size={24} className="icon" />
+              <SearchInput placeholder="Search" />
+            </SearchWrapper>
+          </Left>
 
-        <Right>
-          <CiSearch size={24} className="search-mobile" />
+          <Right>
+            <CiSearch size={24} className="search-mobile" />
 
-          <WriteBtn>
-            <PiNotePencilThin size={26} />
-            <span>Write</span>
-          </WriteBtn>
+            <WriteBtn>
+              <PiNotePencilThin size={26} />
+              <span>Write</span>
+            </WriteBtn>
 
-          <VscBell size={25} className="bell" />
+            <VscBell size={25} className="bell" />
 
-          <Avatar />
-        </Right>
-      </NavContainer>
-    </Nav>
+            <Avatar />
+          </Right>
+        </NavContainer>
+      </Nav>
+    </>
   );
 }
 

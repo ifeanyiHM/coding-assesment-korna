@@ -12,10 +12,6 @@ export interface MediumFeedItem {
   tag?: string;
 }
 
-// export interface MediumFeedProps {
-//   mediumFeed: MediumFeedItem[];
-// }
-
 export const mediumFeed = [
   {
     category: "Language Lab",
@@ -72,7 +68,6 @@ export const staffPicks = [
     author: "Zulie @ Medium",
     category: "The Medium Handbook",
     stats: { date: "2d ago" },
-    tag: "tag",
   },
   {
     title:

@@ -1,12 +1,16 @@
 import styled from "styled-components";
+
+import GlobalStyles from "../styles/GlobalStyles";
+import Author from "./Author";
+
+import type { MediumFeedItem } from "../data/data";
+import { useIsMobileScreen } from "../hooks/useIsMobileScreen";
+
 import { FaHandsClapping, FaComment } from "react-icons/fa6";
 import { PiStarFourFill } from "react-icons/pi";
 import { CiCircleMinus } from "react-icons/ci";
 import { MdOutlineBookmarkAdd } from "react-icons/md";
 import { HiDotsHorizontal } from "react-icons/hi";
-import type { MediumFeedItem } from "../data/data";
-import "../index.css";
-import { useIsMobileScreen } from "../hooks/useIsMobileScreen";
 
 const ArticleWrapper = styled.article`
   display: flex;
@@ -36,41 +40,15 @@ const ClapNotice = styled.div`
   align-items: center;
   gap: 0.25rem;
   font-size: 0.875rem;
-  color: #6b6b6b;
+  color: var(--color-secondary);
   margin-bottom: 2rem;
 
   .user {
-    color: #242424;
+    color: var(--color-primary);
   }
 
   @media (min-width: 768px) {
     font-size: 1rem;
-  }
-`;
-
-const MetaRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.813rem;
-  color: #6b6b6b;
-  margin-bottom: 1rem;
-
-  .strong a {
-    color: #000;
-    text-decoration: none;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-
-  @media (min-width: 768px) {
-    font-size: 1rem;
-  }
-
-  @media (min-width: 1280px) {
-    font-size: 0.813rem;
   }
 `;
 
@@ -86,8 +64,7 @@ const TextContent = styled.div`
 const Title = styled.h2`
   font-size: 1rem;
   font-weight: 600;
-  color: #242424;
-  margin: 0;
+  margin: 1rem 0 0 0;
 
   @media (min-width: 500px) {
     font-size: 1.25rem;
@@ -100,7 +77,8 @@ const Title = styled.h2`
 const Excerpt = styled.p`
   margin: 0.25rem 0 0 0;
   font-size: 0.875rem;
-  color: #4b5563;
+  color: var(--color-secondary);
+  font-weight: 400;
 
   @media (min-width: 768px) {
     font-size: 1rem;
@@ -117,7 +95,7 @@ const StatsRow = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
-  color: #6b6b6b;
+  color: var(--color-secondary);
   font-size: 0.813rem;
 
   .icon {
@@ -182,83 +160,74 @@ function Article({ item, index }: ArticleProps) {
   const isMobile = useIsMobileScreen();
 
   return (
-    <ArticleWrapper>
-      <ArticleBody>
-        {index === 1 && (
-          <ClapNotice>
-            <FaHandsClapping size={14} />
-            <span className="user">Trey Huffine</span> clapped
-          </ClapNotice>
-        )}
+    <>
+      <GlobalStyles />
+      <ArticleWrapper>
+        <ArticleBody>
+          {index === 1 && (
+            <ClapNotice>
+              <FaHandsClapping size={14} />
+              <span className="user">Trey Huffine</span> clapped
+            </ClapNotice>
+          )}
 
-        <MetaRow>
-          <img
-            src={`/profile${index + 1}.PNG`}
-            alt="profile"
+          <Author
+            index={index}
+            item={item}
             width={20}
             height={20}
+            src="profile"
           />
-          {item.category && "In"}{" "}
-          <span className="strong">
-            <a href="#">{item.category}</a>
-          </span>{" "}
-          {item.category && "by"}
-          <span className="strong">
-            <a href="#">{item.author}</a>
-          </span>
-          {item.tag && (
-            <img src={`/${item.tag}.PNG`} alt="tag" width={14} height={14} />
-          )}
-        </MetaRow>
 
-        <ContentRow>
-          <TextContent>
-            <Title>{item.title}</Title>
-            <Excerpt>
-              {item.excerpt?.length && isMobile && item.excerpt.length > 71
-                ? `${item.excerpt.slice(0, 65)}...`
-                : item.excerpt}
-            </Excerpt>
-          </TextContent>
-          <MobileImage>
-            <img
-              src={`/articleImage${index + 1}.PNG`}
-              alt={item.title}
-              width={80}
-              height={53}
-            />
-          </MobileImage>
-        </ContentRow>
+          <ContentRow>
+            <TextContent>
+              <Title>{item.title}</Title>
+              <Excerpt>
+                {item.excerpt?.length && isMobile && item.excerpt.length > 71
+                  ? `${item.excerpt.slice(0, 65)}...`
+                  : item.excerpt}
+              </Excerpt>
+            </TextContent>
+            <MobileImage>
+              <img
+                src={`/articleImage${index + 1}.PNG`}
+                alt={item.title}
+                width={80}
+                height={53}
+              />
+            </MobileImage>
+          </ContentRow>
 
-        <StatsRow>
-          <PiStarFourFill color="#ffc017" />
-          <span>{item.stats.date}</span>
-          <span className="icon">
-            <FaHandsClapping size={16} /> {item.stats.claps}
-          </span>
-          <span className="icon">
-            <FaComment size={12} className="flip" /> {item.stats.comments}
-          </span>
+          <StatsRow>
+            <PiStarFourFill color="#ffc017" />
+            <span>{item.stats.date}</span>
+            <span className="icon">
+              <FaHandsClapping size={16} /> {item.stats.claps}
+            </span>
+            <span className="icon">
+              <FaComment size={12} className="flip" /> {item.stats.comments}
+            </span>
 
-          <Actions>
-            <CiCircleMinus size={22} />
-            <BookmarkDesktop>
-              <MdOutlineBookmarkAdd size={22} />
-            </BookmarkDesktop>
-            <HiDotsHorizontal size={20} />
-          </Actions>
-        </StatsRow>
-      </ArticleBody>
+            <Actions>
+              <CiCircleMinus size={22} />
+              <BookmarkDesktop>
+                <MdOutlineBookmarkAdd size={22} />
+              </BookmarkDesktop>
+              <HiDotsHorizontal size={20} />
+            </Actions>
+          </StatsRow>
+        </ArticleBody>
 
-      <DesktopImage>
-        <img
-          src={`/articleImage${index + 1}.PNG`}
-          alt={item.title}
-          width={160}
-          height={107}
-        />
-      </DesktopImage>
-    </ArticleWrapper>
+        <DesktopImage>
+          <img
+            src={`/articleImage${index + 1}.PNG`}
+            alt={item.title}
+            width={160}
+            height={107}
+          />
+        </DesktopImage>
+      </ArticleWrapper>
+    </>
   );
 }
 
