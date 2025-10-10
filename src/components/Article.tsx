@@ -3,7 +3,7 @@ import styled from "styled-components";
 import GlobalStyles from "../styles/GlobalStyles";
 import Author from "./Author";
 
-import type { MediumFeedItem } from "../data/data";
+import type { DevToArticle } from "../data/data";
 import { useIsMobileScreen } from "../hooks/useIsMobileScreen";
 
 import { FaHandsClapping, FaComment } from "react-icons/fa6";
@@ -11,8 +11,9 @@ import { PiStarFourFill } from "react-icons/pi";
 import { CiCircleMinus } from "react-icons/ci";
 import { MdOutlineBookmarkAdd } from "react-icons/md";
 import { HiDotsHorizontal } from "react-icons/hi";
+import { formatDate } from "../utilities/constant";
 
-const ArticleWrapper = styled.article`
+export const ArticleWrapper = styled.article`
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -31,7 +32,7 @@ const ArticleWrapper = styled.article`
   }
 `;
 
-const ArticleBody = styled.div`
+export const ArticleBody = styled.div`
   flex: 1;
 `;
 
@@ -52,13 +53,13 @@ const ClapNotice = styled.div`
   }
 `;
 
-const ContentRow = styled.div`
+export const ContentRow = styled.div`
   display: flex;
   gap: 1rem;
   margin-top: 1rem;
 `;
 
-const TextContent = styled.div`
+export const TextContent = styled.div`
   flex: 1;
 `;
 
@@ -91,7 +92,7 @@ const Excerpt = styled.p`
   }
 `;
 
-const StatsRow = styled.div`
+export const StatsRow = styled.div`
   margin: 0.75rem 0 0 0;
   display: flex;
   align-items: center;
@@ -128,7 +129,7 @@ const Actions = styled.div`
   cursor: pointer;
 `;
 
-const MobileImage = styled.div`
+export const MobileImage = styled.div`
   flex-shrink: 0;
 
   @media (min-width: 768px) {
@@ -136,7 +137,7 @@ const MobileImage = styled.div`
   }
 `;
 
-const DesktopImage = styled.div`
+export const DesktopImage = styled.div`
   display: none;
   flex-shrink: 0;
 
@@ -153,7 +154,7 @@ const BookmarkDesktop = styled.div`
 `;
 
 interface ArticleProps {
-  item: MediumFeedItem;
+  item: DevToArticle;
   index: number;
 }
 
@@ -184,15 +185,17 @@ function Article({ item, index }: ArticleProps) {
             <TextContent>
               <Title>{item.title}</Title>
               <Excerpt>
-                {item.excerpt?.length && isMobile && item.excerpt.length > 71
-                  ? `${item.excerpt.slice(0, 65)}...`
-                  : item.excerpt}
+                {item.description?.length &&
+                isMobile &&
+                item.description.length > 71
+                  ? `${item.description.slice(0, 65)}...`
+                  : item.description}
               </Excerpt>
             </TextContent>
             <MobileImage>
               <img
-                src={`/articleImage${index + 1}.PNG`}
-                alt={item.title}
+                src={item.social_image ?? `/articleImage1.PNG`}
+                alt={item.title || "Article image"}
                 width={80}
                 height={53}
               />
@@ -201,12 +204,12 @@ function Article({ item, index }: ArticleProps) {
 
           <StatsRow>
             <PiStarFourFill color="#ffc017" />
-            <span>{item.stats.date}</span>
+            <span>{formatDate(item.created_at)}</span>
             <span className="icon">
-              <FaHandsClapping size={16} /> {item.stats.claps}
+              <FaHandsClapping size={16} /> {item.positive_reactions_count}
             </span>
             <span className="icon">
-              <FaComment size={12} className="flip" /> {item.stats.comments}
+              <FaComment size={12} className="flip" /> {item.comments_count}
             </span>
 
             <Actions>
@@ -221,8 +224,8 @@ function Article({ item, index }: ArticleProps) {
 
         <DesktopImage>
           <img
-            src={`/articleImage${index + 1}.PNG`}
-            alt={item.title}
+            src={item.social_image ?? `/articleImage1.PNG`}
+            alt={item.title || "Article image"}
             width={160}
             height={107}
           />

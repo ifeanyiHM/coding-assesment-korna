@@ -4,19 +4,20 @@ import Author from "./Author";
 import GlobalStyles from "../styles/GlobalStyles";
 
 import { PiStarFourFill } from "react-icons/pi";
-import type { MediumFeedItem } from "../data/data";
+import type { DevToArticle } from "../data/data";
+import { formatDate } from "../utilities/constant";
 
-const AsideArticle = styled.article`
+export const AsideArticle = styled.article`
   padding: 0.625rem 0;
   cursor: pointer;
 `;
 
-const Title = styled.h3`
+export const Title = styled.h3`
   font-size: 1rem;
   margin: 0.25rem 0 0 0;
 `;
 
-const Stats = styled.div`
+export const Stats = styled.div`
   margin-top: 0.75rem;
   display: flex;
   align-items: center;
@@ -26,7 +27,7 @@ const Stats = styled.div`
 `;
 
 interface StaffPickProps {
-  item: MediumFeedItem;
+  item: DevToArticle;
   index: number;
 }
 
@@ -50,7 +51,7 @@ function StaffPick({ item, index }: StaffPickProps) {
 
           <Stats>
             {index === 1 && <PiStarFourFill color="#ffc017" />}
-            <span>{item.stats.date}</span>
+            <span>{formatDate(item.created_at)}</span>
           </Stats>
         </div>
       </AsideArticle>

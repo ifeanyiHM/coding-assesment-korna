@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import GlobalStyles from "../styles/GlobalStyles";
 
-import type { MediumFeedItem } from "../data/data";
+import type { DevToArticle } from "../data/data";
 
 const MetaRow = styled.div`
   display: flex;
@@ -38,37 +38,38 @@ const MetaRowImage = styled.div`
 `;
 
 interface AuthorProps {
-  item: MediumFeedItem;
+  item: DevToArticle;
   index: number;
   width: number;
   height: number;
   src: string;
 }
 
-function Author({ index, item, width, height, src }: AuthorProps) {
+// function Author({ index, item, width, height, src }: AuthorProps) {
+function Author({ item, width, height }: AuthorProps) {
   return (
     <>
       <GlobalStyles />
       <MetaRow>
         <MetaRowImage>
           <img
-            src={`/${src}${index + 1}.PNG`}
+            src={item.user?.profile_image_90}
             alt="profile"
             width={width}
             height={height}
           />
         </MetaRowImage>
-        {item.category && <span className="strong">In</span>}
+        {item.organization && <span className="strong">In</span>}
         <span className="strong">
-          <a href="#">{item.category}</a>
+          <a href="#">{item?.user?.username}</a>
         </span>
-        {item.category && <span className="strong">by</span>}
+        {item.organization && <span className="strong">by</span>}
         <span className="strong">
-          <a href="#">{item.author}</a>
+          <a href="#">{item?.user?.name}</a>
         </span>
-        {item.tag && (
+        {/* {item.or && (
           <img src={`/${item.tag}.PNG`} alt="tag" width={14} height={14} />
-        )}
+        )} */}
       </MetaRow>
     </>
   );

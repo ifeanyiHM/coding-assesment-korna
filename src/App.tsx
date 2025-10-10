@@ -1,14 +1,17 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import styled from "styled-components";
+import "react-loading-skeleton/dist/skeleton.css";
+
 import { HiArrowUpRight } from "react-icons/hi2";
 
 import {
   links,
-  mediumFeed,
+  // mediumFeed,
   recommendedTopics,
-  staffPicks,
+  // staffPicks,
   whoToFollow,
+  type DevToArticle,
 } from "./data/data";
 import Navigation from "./components/Navigation";
 import Article from "./components/Article";
@@ -16,6 +19,14 @@ import StaffPick from "./components/StaffPick";
 import { MdOutlineBookmarkAdd } from "react-icons/md";
 import GlobalStyles from "./styles/GlobalStyles";
 import Button from "./styles/Button";
+import SkeletonArticle from "./components/skeleton/SkeletonArticle";
+import StaffPickSkeleton from "./components/skeleton/StaffPickSkeleton";
+import {
+  FollowSkeleton,
+  LinkListSkeleton,
+  ReadingSkeleton,
+  TopicSkeleton,
+} from "./components/skeleton/AsideSkeleton";
 
 const TopBar = styled.div`
   display: flex;
@@ -128,12 +139,12 @@ const Heading = styled.h2`
   font-size: 1rem;
 `;
 
-const Title = styled.h2`
+export const Title = styled.h2`
   font-size: 1.125rem;
   margin-bottom: 1rem;
 `;
 
-const TopicList = styled.ul`
+export const TopicList = styled.ul`
   display: flex;
   flex-wrap: wrap;
   gap: 0.625rem;
@@ -163,7 +174,7 @@ const Description = styled.p`
   }
 `;
 
-const List = styled.ul`
+export const List = styled.ul`
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -171,24 +182,24 @@ const List = styled.ul`
   margin-bottom: 1rem;
 `;
 
-const ListItem = styled.li`
+export const ListItem = styled.li`
   display: flex;
   align-items: flex-start;
   gap: 0.75rem;
 `;
 
-const AvatarWrapper = styled.div`
+export const AvatarWrapper = styled.div`
   flex-shrink: 0;
   cursor: pointer;
 `;
 
-const Info = styled.div`
+export const Info = styled.div`
   flex: 1;
   min-width: 0;
   cursor: pointer;
 `;
 
-const NameRow = styled.div`
+export const NameRow = styled.div`
   display: flex;
   align-items: center;
   gap: 0.25rem;
@@ -207,7 +218,7 @@ const Type = styled.p`
   margin: 0 0 0.25rem 0;
 `;
 
-const FDescription = styled.p`
+export const FDescription = styled.p`
   font-size: 0.875rem;
   color: var(--color-secondary);
   display: -webkit-box;
@@ -217,11 +228,11 @@ const FDescription = styled.p`
   margin: 0;
 `;
 
-const LinkListWrapper = styled.div`
+export const LinkListWrapper = styled.div`
   margin-bottom: 2.5rem;
 `;
 
-const LinkList = styled.ul`
+export const LinkList = styled.ul`
   display: flex;
   flex-wrap: wrap;
   gap: 0 0.5rem;
@@ -231,7 +242,7 @@ const LinkList = styled.ul`
   padding: 0;
 `;
 
-const Item = styled.li`
+export const Item = styled.li`
   font-size: 0.6875rem;
   color: var(--color-secondary);
 `;
@@ -247,6 +258,52 @@ const StyledLink = styled.a`
 
 function App() {
   const [category, setCategory] = useState("For you");
+  const [articles, setArticles] = useState<DevToArticle[]>([]);
+  const [visibleCount, setVisibleCount] = useState(6);
+  const [loading, setLoading] = useState(true);
+  const loaderRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        const res = await fetch("https://dev.to/api/articles");
+        const data = await res.json();
+        setArticles(data);
+      } catch (err) {
+        console.error("Error fetching articles:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchArticles();
+  }, []);
+
+  useEffect(() => {
+    if (loading) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const target = entries[0];
+        if (target.isIntersecting) {
+          setVisibleCount((prev) => prev + 6);
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    const current = loaderRef.current;
+    if (current) observer.observe(current);
+
+    return () => {
+      if (current) observer.unobserve(current);
+    };
+  }, [loading]);
+
+  const visibleArticles = articles.slice(0, visibleCount);
+
+  console.log(articles);
+
   return (
     <>
       <GlobalStyles />
@@ -273,11 +330,16 @@ function App() {
               </TabRow>
 
               <Articles>
-                {mediumFeed.map((item, index) => (
-                  <Article key={index} item={item} index={index} />
-                ))}
+                {loading
+                  ? Array.from({ length: 6 }).map((_, i) => (
+                      <SkeletonArticle key={i} />
+                    ))
+                  : visibleArticles.map((item: DevToArticle, index: number) => (
+                      <Article key={index} item={item} index={index} />
+                    ))}
               </Articles>
             </Wrapper.Section>
+            <div ref={loaderRef} className="h-1"></div>
           </Section>
 
           <Wrapper.Aside>
@@ -285,91 +347,118 @@ function App() {
             <Wrapper.Tag>
               <Heading>Staff Picks</Heading>
               <div style={{ padding: " 0 0 10px 0" }}>
-                {staffPicks.map((item, index) => (
-                  <StaffPick key={index} item={item} index={index} />
-                ))}
+                {loading
+                  ? Array.from({ length: 3 }).map((_, index) => (
+                      <StaffPickSkeleton key={index} />
+                    ))
+                  : articles
+                      .slice(0, 3)
+                      .map((item, index) => (
+                        <StaffPick key={index} item={item} index={index} />
+                      ))}
               </div>
-              <Button type="see more">See the full list</Button>
+              {!loading && <Button type="see more">See the full list</Button>}
             </Wrapper.Tag>
 
             {/* Recommended Topics Section */}
             <Wrapper.Topic>
-              <Title>Recommended topics</Title>
+              {!loading && <Title>Recommended topics</Title>}
               <TopicList>
-                {recommendedTopics.map((topic) => (
-                  <li key={topic}>
-                    <Button type="topic">{topic}</Button>
-                  </li>
-                ))}
+                {loading ? (
+                  <TopicSkeleton />
+                ) : (
+                  recommendedTopics.map((topic) => (
+                    <li key={topic}>
+                      <Button type="topic">{topic}</Button>
+                    </li>
+                  ))
+                )}
               </TopicList>
-              <Button type="see more">See more topics</Button>
+              {!loading && <Button type="see more">See more topics</Button>}
             </Wrapper.Topic>
 
             {/* Who to Follow Section */}
             <Wrapper.Tag>
-              <Title>Who to follow</Title>
+              {!loading && <Title>Who to follow</Title>}
               <List>
-                {whoToFollow.map((user, index) => (
-                  <ListItem key={index}>
-                    <AvatarWrapper>
-                      <img
-                        src={`/follow${index + 1}.PNG`}
-                        alt="profile"
-                        width={37}
-                        height={33}
-                        style={{ objectFit: "cover" }}
-                      />
-                    </AvatarWrapper>
+                {loading ? (
+                  <FollowSkeleton />
+                ) : (
+                  whoToFollow.map((user, index) => (
+                    <ListItem key={index}>
+                      <AvatarWrapper>
+                        <img
+                          src={`/follow${index + 1}.PNG`}
+                          alt="profile"
+                          width={37}
+                          height={33}
+                          style={{ objectFit: "cover" }}
+                        />
+                      </AvatarWrapper>
 
-                    <Info>
-                      <NameRow>
-                        <Name>{user.name}</Name>
-                        {user.verified && (
-                          <img
-                            src="/drTag.PNG"
-                            alt="verified"
-                            width={20}
-                            height={20}
-                            style={{ objectFit: "cover" }}
-                          />
-                        )}
-                      </NameRow>
-                      {user.type && <Type>{user.type}</Type>}
-                      <FDescription>{user.description}</FDescription>
-                    </Info>
+                      <Info>
+                        <NameRow>
+                          <Name>{user.name}</Name>
+                          {user.verified && (
+                            <img
+                              src="/drTag.PNG"
+                              alt="verified"
+                              width={20}
+                              height={20}
+                              style={{ objectFit: "cover" }}
+                            />
+                          )}
+                        </NameRow>
+                        {user.type && <Type>{user.type}</Type>}
+                        <FDescription>{user.description}</FDescription>
+                      </Info>
 
-                    <Button type="follow">Follow</Button>
-                  </ListItem>
-                ))}
+                      <Button type="follow">Follow</Button>
+                    </ListItem>
+                  ))
+                )}
               </List>
-              <Button type="see more">See more suggestions</Button>
+              {!loading && (
+                <Button type="see more">See more suggestions</Button>
+              )}
             </Wrapper.Tag>
 
             {/* Reading List Section */}
             <Wrapper.Reading>
-              <ReadingTitle>Reading list</ReadingTitle>
-              <Description>
-                <span>Click the</span>
-                <MdOutlineBookmarkAdd size={22} />
-                <span>
-                  on any story to easily add it to your reading list or a custom
-                  list that you can share.
-                </span>
-              </Description>
+              {loading ? (
+                <ReadingSkeleton />
+              ) : (
+                <>
+                  <ReadingTitle>Reading list</ReadingTitle>
+                  <Description>
+                    <span>Click the</span>
+                    <MdOutlineBookmarkAdd size={22} />
+                    <span>
+                      on any story to easily add it to your reading list or a
+                      custom list that you can share.
+                    </span>
+                  </Description>
+                </>
+              )}
             </Wrapper.Reading>
 
             {/* Linked paged section */}
             <LinkListWrapper>
               <LinkList>
-                {links.map((link) => (
-                  <Item key={link}>
-                    <StyledLink href="#">{link}</StyledLink>
-                  </Item>
-                ))}
+                {loading ? (
+                  <LinkListSkeleton />
+                ) : (
+                  links.map((link) => (
+                    <Item key={link}>
+                      <StyledLink href="#">{link}</StyledLink>
+                    </Item>
+                  ))
+                )}
               </LinkList>
             </LinkListWrapper>
           </Wrapper.Aside>
         </Main>
+        <div ref={loaderRef} className="h-1"></div>
       </Wrapper.Tag>
     </>
   );
