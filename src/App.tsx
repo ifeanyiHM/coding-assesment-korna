@@ -63,6 +63,10 @@ const Wrapper = {
       display: block;
       width: 33%;
       padding-left: 1.5rem;
+      position: sticky;
+      /* top: -26.5rem; */
+      align-self: flex-start;
+      height: fit-content;
     }
 
     @media (min-width: 1280px) {
@@ -263,6 +267,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const loaderRef = useRef<HTMLDivElement | null>(null);
 
+  //fetch articles
   useEffect(() => {
     const fetchArticles = async () => {
       try {
@@ -279,6 +284,7 @@ function App() {
     fetchArticles();
   }, []);
 
+  //infinite scrolling
   useEffect(() => {
     if (loading) return;
 
@@ -303,6 +309,29 @@ function App() {
   const visibleArticles = articles.slice(0, visibleCount);
 
   console.log(articles);
+
+  // Dynamically sets the aside's sticky top position so that when it sticks,
+  // its bottom aligns with the bottom of the viewport. This allows the aside
+  // to scroll naturally with the page until its last content is visible, then
+  // stops scrolling while the main content continues.
+  useEffect(() => {
+    const aside = document.querySelector("aside");
+    if (!aside) return;
+
+    const updateStickyTop = () => {
+      const asideHeight = aside.offsetHeight;
+      const viewportHeight = window.innerHeight;
+      const topValue = -(asideHeight - viewportHeight);
+
+      aside.style.top = `${topValue}px`;
+    };
+
+    updateStickyTop();
+
+    window.addEventListener("resize", updateStickyTop);
+
+    return () => window.removeEventListener("resize", updateStickyTop);
+  }, []);
 
   return (
     <>
